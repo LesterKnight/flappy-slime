@@ -17,7 +17,7 @@ const config = {
             gravity:{
                 y: 5000
             },
-            debug: true
+            debug: false
         }
     }
 }
