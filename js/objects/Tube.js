@@ -1,3 +1,5 @@
+import ScoreBox from "./ScoreBox.js"
+
 export default class Tube extends Phaser.GameObjects.Sprite {
     constructor(scene, x = 550, y = 0, space = 230,speed=-100) {
         super(scene, x, y, 'pipe', 1)
@@ -11,6 +13,7 @@ export default class Tube extends Phaser.GameObjects.Sprite {
         this.setOrigin(1, 0)
         this.createdNewOne = false
         scene.tubeGroup.add(this)
+        new ScoreBox(scene, this.x, this.y + this.displayHeight, this.displayWidth, space, speed)
         scene.add.existing(this)
         this.body.setVelocityX(speed)
     }

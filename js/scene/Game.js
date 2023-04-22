@@ -14,22 +14,23 @@ export default class Game extends Phaser.Scene {
         this.musicMain.stop()
         this.musicGameOver.play()
         this.tubeGroup.setVelocityX(0)
-    }
-
-    preload(){
-
+        this.scoreGroup.setVelocityX(0)
     }
 
     create() {
         this.gameOver = false
         this.musicMain = this.sound.add('coffin', { loop: true })
         this.musicGameOver = this.sound.add('gameover', { loop: true })
+        this.musicGameOver.setVolume(0.7)
+        this.soundCoin = this.sound.add('coin', { loop: false })
+        this.soundCoin.setVolume(0.2)
         this.tileSprite = this.add.tileSprite(0, 0, 320, 224, 'background').setOrigin(0, 0).setScale(3.6)
         this.physics.world.setBounds(0, 0, 480, 800)
         this.title = new Title(this)
         this.player = new Player(this)
         this.player.create()
         this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
+        this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
 
         let colors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x4b0082, 0x8b00ff]
         let tintSpeed = 100
@@ -62,16 +63,37 @@ export default class Game extends Phaser.Scene {
                 this.gameOverAnimation()
             } 
         }
+        this.score = 0
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '16px', fill: '#000' })
+
+        this.physics.add.overlap(this.scoreGroup, this.player, handleCoins.bind(this))
+        function handleCoins(element1, element2) {
+            //console.log(`element1.x:${element1.x} element2.x${element2.x}`)
+            if(element1.x >= element2.x-10&&!element1.crashed){
+                element2.destroy()
+                this.score++
+                this.scoreText.setText('Score: ' + this.score)
+                this.soundCoin.play()
+            }
+                
+        }
+
+        this.input.on('pointerdown', () => {
+           this.player.click = true
+        })
+        this.input.on('pointerup', () => {
+            this.player.click = false
+        }) 
     }
+
     update() {
         this.player.update()
-        if (this.player.spacebar.isDown && !this.player.crashed) {//START GAME
-            if (!this.run) {
+        if ((this.player.spacebar.isDown ||this.player.click) && !this.player.crashed && !this.run) {//START GAME
                 this.run = true
                 this.player.body.setAllowGravity(true)
                 this.title.setVisible(false)
                 this.musicMain.play()
-            }
+            
         }
         if (!this.player.crashed) {
             this.tileSprite.tilePositionX += 0.3

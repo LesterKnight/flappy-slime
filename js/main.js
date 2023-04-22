@@ -10,14 +10,13 @@ const config = {
         Load,
         Game
     ],
-    //fps: 500,
     physics: {
         default: 'arcade',
         arcade:{
             gravity:{
                 y: 5000
             },
-            debug: true
+            debug: false
         }
     }
 }

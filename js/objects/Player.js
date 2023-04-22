@@ -1,3 +1,4 @@
+let i=0
 export default class Player extends Phaser.GameObjects.Sprite {
     constructor(scene, jumpSpeed = -900) {
         super(scene, 170, 300, 'amoeba')
@@ -5,6 +6,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.jumpSpeed = jumpSpeed
         this.jumping = false
         this.crashed = false
+        this.click = false
         this.scene = scene
         this.setOrigin(0, 0)
         this.setScale(3)
@@ -12,16 +14,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.body.setAllowGravity(false)
         this.body.setCollideWorldBounds(true)
         this.body.onWorldBounds = true // trigger when body touches the border
-/*
-        this.body.world.on('worldbounds', function (body) {
-            if (body.gameObject === this) {
-                if (!this.crashed){
-                    this.crash()
-                    this.scene.gameOverAnimation()
-                }
-            }
-        }, this)//player becomes this in the context
-*/
+
         scene.add.existing(this)
     }
     crash() {
@@ -35,7 +28,20 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.setRotation(this.rotation + 0.05)
     }
 
-    disable(){
+    isAbleToJump(){
+        return (this.spacebar.isDown ||this.click) && !this.jumping && !this.crashed
+    }
+
+    jump() {
+        if(!this.jumping){
+            this.jumping = true
+            this.jumpEffect.play()
+            this.body.setVelocityY(this.jumpSpeed)
+            this.anims.play('jump', true)
+        }
+    }
+
+    disable() {
         this.body.setVelocity(0)
         this.anims.stop()
         this.setVisible(false)
@@ -43,14 +49,15 @@ export default class Player extends Phaser.GameObjects.Sprite {
     }
 
 
-    isOutOfBounds(){
-        return (this.body.y > 800 || this.body.x > 480) 
+    isOutOfBounds() {
+        return (this.body.y > 800 || this.body.x > 480)
     }
 
     create() {
         this.keys = this.scene.input.keyboard.createCursorKeys()
         this.spacebar = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
         this.jumpEffect = this.scene.sound.add('jumping')
+        this.jumpEffect.setVolume(0.3)
 
         this.anims.create({
             key: 'jump',
@@ -68,12 +75,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.anims.play('stop', true)
     }
     update() {
-        if (this.spacebar.isDown && !this.jumping && !this.crashed) {
-            this.jumping = true
-            this.jumpEffect.play()
-            this.body.setVelocityY(this.jumpSpeed)
-            this.anims.play('jump', true)
-        } else if (this.spacebar.isUp) {
+        if (this.isAbleToJump()) {
+            this.jump()
+        } else if (this.spacebar.isUp && !this.click) {
             this.jumping = false
         }
     }
