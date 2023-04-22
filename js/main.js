@@ -1,5 +1,5 @@
-import Load from './Load.js'
-import Game from './Game.js'
+import Load from './scene/Load.js'
+import Game from './scene/Game.js'
 
 const config = {
     type: Phaser.AUTO,
@@ -17,7 +17,7 @@ const config = {
             gravity:{
                 y: 5000
             },
-            debug: false
+            debug: true
         }
     }
 }

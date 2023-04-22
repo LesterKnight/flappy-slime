@@ -9,7 +9,6 @@ export default class Load extends Phaser.Scene {
             this.scene.start('GameScene')
         })
         this.load.image('background', 'images/bg.png' )
-    
         this.load.image('title', 'images/title.png' )
         this.load.audio('coffin','music/coffin.mp3')
         this.load.audio('gameover','music/gameover.mp3')
@@ -25,18 +24,7 @@ export default class Load extends Phaser.Scene {
         })
     }
     create(){
-        this.anims.create({
-            key:'jump',
-            frames:this.anims.generateFrameNumbers('amoeba',{start:3, end:5}),
-            frameRate:10,
-            repeat:1
-        })
-        this.anims.create({
-            key:'stop',
-            frames:this.anims.generateFrameNumbers('amoeba',{start:6, end:8}),
-            frameRate:10,
-            repeat:-1
-        })
+        
     }
     update(){
 
