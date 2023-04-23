@@ -64,8 +64,9 @@ export default class Game extends Phaser.Scene {
             } 
         }
         this.score = 0
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '16px', fill: '#000' })
-
+        this.scoreText = this.add.text(160, 16, 'Score: 0', { fontSize: '32px', fill: '#000',fontWeight: 'bold' })
+        this.scoreText.setDepth(10)
+        this.scoreText.setVisible(false)
         this.physics.add.overlap(this.scoreGroup, this.player, handleCoins.bind(this))
         function handleCoins(element1, element2) {
             //console.log(`element1.x:${element1.x} element2.x${element2.x}`)
@@ -90,6 +91,7 @@ export default class Game extends Phaser.Scene {
         this.player.update()
         if ((this.player.spacebar.isDown ||this.player.click) && !this.player.crashed && !this.run) {//START GAME
                 this.run = true
+                this.scoreText.setVisible(true)
                 this.player.body.setAllowGravity(true)
                 this.title.setVisible(false)
                 this.musicMain.play()
@@ -98,6 +100,7 @@ export default class Game extends Phaser.Scene {
         if (!this.player.crashed) {
             this.tileSprite.tilePositionX += 0.3
         } else {
+            this.player.setRotation(this.player.rotation + 0.05)
             if (this.player.isOutOfBounds()) {
                 this.run = false
                 this.musicGameOver.stop()

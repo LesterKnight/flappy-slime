@@ -25,7 +25,6 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.body.setVelocityX(140)
         this.body.setVelocityY(140)
         this.setOrigin(0.5, 0.5)
-        this.setRotation(this.rotation + 0.05)
     }
 
     isAbleToJump(){

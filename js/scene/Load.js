@@ -8,7 +8,7 @@ export default class Load extends Phaser.Scene {
         this.load.on('complete',()=>{
             this.scene.start('GameScene')
         })
-        this.load.image('background', 'images/bg.png' )
+        this.load.image('background', 'images/bg000.gif' )
         this.load.image('title', 'images/title.png' )
         this.load.audio('coffin','music/coffin.mp3')
         this.load.audio('gameover','music/gameover.mp3')
