@@ -11,10 +11,30 @@ export default class Game extends Phaser.Scene {
     }
 
     gameOverAnimation(){
+        const graphics = this.add.graphics();
+
+        // desenha um retângulo branco que ocupa toda a tela
+        graphics.fillStyle(0xffffff, 1);
+        graphics.fillRect(0, 0, this.cameras.main.width, this.cameras.main.height);
+        
+        // diminui gradualmente a opacidade do retângulo
+        this.tweens.add({
+          targets: graphics,
+          alpha: 0,
+          duration: 500, // duração da animação, em milissegundos
+          ease: 'Power1', // curva de animação
+          onComplete: () => graphics.destroy() // remove o objeto Graphics da cena quando a animação terminar
+        });
+
+
+
+
         this.musicMain.stop()
         this.musicGameOver.play()
         this.tubeGroup.setVelocityX(0)
+        //this.tubeGroup.setVisible(false)
         this.scoreGroup.setVelocityX(0)
+        this.tileBackground.setTexture('bg4')
     }
 
     create() {
@@ -24,7 +44,24 @@ export default class Game extends Phaser.Scene {
         this.musicGameOver.setVolume(0.7)
         this.soundCoin = this.sound.add('coin', { loop: false })
         this.soundCoin.setVolume(0.2)
-        this.tileSprite = this.add.tileSprite(0, 0, 320, 224, 'background').setOrigin(0, 0).setScale(3.6)
+
+        const backgrounds = ['bg0', 'bg1', 'bg2', 'bg3'];
+        const randomIndex = Math.floor(Math.random() * backgrounds.length);
+
+        
+
+        this.tileBackground = this.add.tileSprite(0, 0, 320, 224, backgrounds[randomIndex])
+        this.tileBackground.setOrigin(0, 0)
+        this.tileBackground.setScale(3.6)
+        
+/*
+        this.tileGround = this.add.tileSprite(0, 750, 480, 30, 'gnd')
+        this.tileGround.setOrigin(0, 0)
+        this.tileGround.setScale(2)
+        this.tileGround.setDepth(9)
+        this.tileGround.tilePositionX =  undefined
+*/
+
         this.physics.world.setBounds(0, 0, 480, 800)
         this.title = new Title(this)
         this.player = new Player(this)
@@ -64,16 +101,28 @@ export default class Game extends Phaser.Scene {
             } 
         }
         this.score = 0
-        this.scoreText = this.add.text(160, 16, 'Score: 0', { fontSize: '32px', fill: '#000',fontWeight: 'bold' })
-        this.scoreText.setDepth(10)
+
+        const style = {
+            fontFamily: 'super-mario-world-superbig',
+            fontSize: 48,
+            stroke: '#000000',
+            strokeThickness: 6,
+        };
+
+        this.scoreText = this.add.text(220, 16, '0', style)
+
+
+
+
+        
+        this.scoreText.setDepth(11)
         this.scoreText.setVisible(false)
         this.physics.add.overlap(this.scoreGroup, this.player, handleCoins.bind(this))
         function handleCoins(element1, element2) {
-            //console.log(`element1.x:${element1.x} element2.x${element2.x}`)
             if(element1.x >= element2.x-10&&!element1.crashed){
                 element2.destroy()
                 this.score++
-                this.scoreText.setText('Score: ' + this.score)
+                this.scoreText.setText(this.score)
                 this.soundCoin.play()
             }
                 
@@ -89,37 +138,40 @@ export default class Game extends Phaser.Scene {
 
     update() {
         this.player.update()
+        this.tileBackground.tilePositionX += 0.3
+
         if ((this.player.spacebar.isDown ||this.player.click) && !this.player.crashed && !this.run) {//START GAME
                 this.run = true
                 this.scoreText.setVisible(true)
                 this.player.body.setAllowGravity(true)
-                this.title.setVisible(false)
+                this.title.destroy()
                 this.musicMain.play()
             
         }
-        if (!this.player.crashed) {
-            this.tileSprite.tilePositionX += 0.3
-        } else {
-            this.player.setRotation(this.player.rotation + 0.05)
-            if (this.player.isOutOfBounds()) {
+        
+            
+    
+            if (this.player.isOutOfBounds() && this.player.crashed) {
                 this.run = false
                 this.musicGameOver.stop()
                 this.player.disable()
                 this.scene.restart()
             }
-        }
 
         let tubes = this.tubeGroup.getChildren()
         if (tubes.length == 0 && this.run)
             new Tube(this, 580, 0);
         tubes.forEach(function (childTube) {
+            //console.log(childTube.body.position.x - childTube.body.prev.x)
             if (childTube.x < 0) {
                 childTube.destroy()
             }
             else if (
-                childTube.x - childTube.displayWidth < 200 &&
+                childTube.x - childTube.displayWidth < 180 &&
                 !childTube.createdNewOne &&
-                childTube.y == 0) {
+                childTube.y == 0 &&
+                !this.player.crashed
+                ) {
                 new Tube(this)
                 childTube.createdNewOne = true
             }

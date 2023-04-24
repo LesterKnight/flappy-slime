@@ -79,6 +79,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
         } else if (this.spacebar.isUp && !this.click) {
             this.jumping = false
         }
+
+        if(this.crashed)
+            this.setRotation(this.rotation + 0.05)
     }
 
 }
