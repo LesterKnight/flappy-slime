@@ -14,12 +14,11 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.body.setAllowGravity(false)
         this.body.setCollideWorldBounds(true)
         this.body.onWorldBounds = true // trigger when body touches the border
-
+        this.setDepth(10)
         scene.add.existing(this)
     }
     crash() {
         this.crashed = true
-        this.setDepth(10);
         this.body.setCollideWorldBounds(false)
         this.body.setAllowGravity(false)
         this.body.setVelocityX(140)

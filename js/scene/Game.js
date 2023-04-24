@@ -1,7 +1,7 @@
 import Title from "../objects/Title.js"
 import Player from "../objects/Player.js"
 import Tube from "../objects/Tube.js"
-var highScore = 0
+
 export default class Game extends Phaser.Scene {
 
     constructor() {
@@ -12,10 +12,8 @@ export default class Game extends Phaser.Scene {
 
     gameOverAnimation() {
         const graphics = this.add.graphics();
-
         graphics.fillStyle(0xffffff, 1);
         graphics.fillRect(0, 0, this.cameras.main.width, this.cameras.main.height);
-
         this.tweens.add({
             targets: graphics,
             alpha: 0,
@@ -35,42 +33,49 @@ export default class Game extends Phaser.Scene {
     }
 
     create() {
-        this.gameOver = false
+        this.physics.world.setBounds(0, 0, 480, 800)
+        this.title = new Title(this)
+        this.player = new Player(this)
+        this.player.create()
+
+        this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
+        this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
+        this.tubeDistance = 180
+        this.score = 0
+
         this.musicMain = this.sound.add('coffin', { loop: true })
         this.musicMain.setVolume(0.8)
         this.musicGameOver = this.sound.add('gameover', { loop: true })
         this.musicGameOver.setVolume(0.5)
         this.soundCoin = this.sound.add('coin', { loop: false })
         this.soundCoin.setVolume(0.2)
-        const backgrounds = ['bg0', 'bg1', 'bg2', 'bg3'];
+ 
+        const backgrounds = ['bg0', 'bg1', 'bg2', 'bg3']
         const randomIndex = Math.floor(Math.random() * backgrounds.length);
         this.tileBackground = this.add.tileSprite(0, 0, 320, 224, backgrounds[randomIndex])
         this.tileBackground.setOrigin(0, 0)
         this.tileBackground.setScale(3.6)
-
         this.tileGround = this.add.tileSprite(0, 750, 480, 30, 'gnd')
         this.tileGround.setOrigin(0, 0)
         this.tileGround.setScale(2)
         this.tileGround.setDepth(9)
-
-        this.physics.world.setBounds(0, 0, 480, 800)
-        this.title = new Title(this)
-        this.player = new Player(this)
-        this.player.create()
-        this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
-        this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
-
-        let colors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x4b0082, 0x8b00ff]
-        let tintSpeed = 100
+        
+        const colors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x4b0082, 0x8b00ff]
+        const tintSpeed = 100
         let colorIndex = 0
-
+        
         this.time.addEvent({
             delay: tintSpeed,
             loop: true,
             callback: () => {
                 if (this.player.crashed) {
-                    this.player.setTint(colors[colorIndex]);
-                    colorIndex = (colorIndex + 1) % colors.length;
+                    this.player.setTint(colors[colorIndex])
+                    colorIndex = (colorIndex + 1) % colors.length
+                    if(this.showHighScore){
+                        this.scoreText.setTint(colors[colorIndex])
+                        this.newHighScore.setTint(colors[colorIndex])
+                    }
+                    
                 }
             }
         })
@@ -91,37 +96,24 @@ export default class Game extends Phaser.Scene {
                 this.gameOverAnimation()
             }
         }
-        this.score = 0
-
-        const style = {
-            fontFamily: 'super-mario-world-superbig',
-            fontSize: 48,
-            stroke: '#000000',
-            strokeThickness: 6,
-        }
-        const styleMini = {
-            fontFamily: 'super-mario-world-superbig',
-            fontSize: 36,
-            stroke: '#000000',
-            strokeThickness: 6,
-        };
-
-        this.scoreText = this.add.text(220, 16, `Hi Score: ${highScore}`, styleMini)
-        this.newHighScore = this.add.text(90, 100, 'NEW HIGH SCORE!', style)
+        
+        this.scoreText = this.add.text(220, 16, `Hi Score: ${this.game.highScore}`, this.game.fontStyleMini)
+        this.newHighScore = this.add.text(90, 100, 'NEW HIGH SCORE!', this.game.fontStyle)
         this.showHighScore = false
 
         this.scoreText.setDepth(11)
         this.newHighScore.setDepth(11)
         this.newHighScore.setVisible(false)
+
         this.physics.add.overlap(this.scoreGroup, this.player, handleCoins.bind(this))
         function handleCoins(element1, element2) {
             if (element1.x >= element2.x - 10 && !element1.crashed) {
                 element2.destroy()
                 this.score++
 
-                if (highScore < this.score) {
+                if (this.game.highScore < this.score) {
                     this.showHighScore = true
-                    highScore = this.score
+                    this.game.highScore = this.score
                 }
 
                 this.scoreText.setText(this.score)
@@ -163,13 +155,14 @@ export default class Game extends Phaser.Scene {
 
         let tubes = this.tubeGroup.getChildren()
         if (tubes.length == 0 && this.run)
-            new Tube(this, 580, 0);
+            new Tube(this, 580, 0)
+
         tubes.forEach(function (childTube) {
             if (childTube.x < 0) {
                 childTube.destroy()
             }
             else if (
-                childTube.x - childTube.displayWidth < 180 &&
+                childTube.x - childTube.displayWidth < this.tubeDistance &&
                 !childTube.createdNewOne &&
                 childTube.y == 0 &&
                 !this.player.crashed
@@ -178,6 +171,5 @@ export default class Game extends Phaser.Scene {
                 childTube.createdNewOne = true
             }
         }, this)
-
     }
 }

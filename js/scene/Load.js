@@ -40,6 +40,21 @@ export default class Load extends Phaser.Scene {
             margin:1
 
         })
+
+        this.game.fontStyle = {
+            fontFamily: 'super-mario-world-superbig',
+            fontSize: 48,
+            stroke: '#000000',
+            strokeThickness: 6,
+        }
+        this.game.fontStyleMini = {
+            fontFamily: 'super-mario-world-superbig',
+            fontSize: 36,
+            stroke: '#000000',
+            strokeThickness: 6,
+        }
+        this.game.highScore = 0
+        
     }
     create(){
         

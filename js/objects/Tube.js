@@ -2,7 +2,7 @@ import ScoreBox from "./ScoreBox.js"
 import TubeHole from "./TubeHole.js"
 
 export default class Tube extends Phaser.GameObjects.Sprite {
-    constructor(scene, x = 550, y = 0, space = 200,speed=-100) {
+    constructor(scene, x = 580, y = 0, space = 195,speed=-100) {
         super(scene, x, y, 'pipe', 1)
         scene.tubeGroup.add(this)
         scene.add.existing(this)
