@@ -4,6 +4,14 @@ export default class Load extends Phaser.Scene {
             key:'PreLoadScene'
         })
     }
+    loadFont(name, url) {
+        var newFont = new FontFace(name, `url(${url})`);
+        newFont.load().then(function (loaded) {
+            document.fonts.add(loaded);
+        }).catch(function (error) {
+            return error;
+        });
+    }
     preload(){
         this.load.on('complete',()=>{
             this.scene.start('GameScene')
@@ -16,6 +24,7 @@ export default class Load extends Phaser.Scene {
         this.load.image('gnd', 'images/ground.png')
 
 
+        this.loadFont("super-mario-world-superbig", '../font/super-mario-world-superbig.ttf');
 
         this.load.image('title', 'images/title.png' )
         this.load.audio('coffin','music/coffin.mp3')

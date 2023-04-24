@@ -1,4 +1,5 @@
 import ScoreBox from "./ScoreBox.js"
+import TubeHole from "./TubeHole.js"
 
 export default class Tube extends Phaser.GameObjects.Sprite {
     constructor(scene, x = 550, y = 0, space = 200,speed=-100) {
@@ -9,6 +10,9 @@ export default class Tube extends Phaser.GameObjects.Sprite {
         if(this.y==0) {
             this.scaleY = [5, 10, 15, 20, 25, 30][Math.floor(Math.random() * 6)]
             new Tube(scene, x, this.displayHeight + space)
+            new TubeHole(scene, x,this.displayHeight + space, speed)
+            new TubeHole(scene, x,this.displayHeight,speed, true)
+            
         }else{
             this.scaleY = 50
         }
