@@ -59,17 +59,17 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
         this.anims.create({
             key: 'jump',
-            frames: this.anims.generateFrameNumbers('amoeba', { start: 3, end: 5 }),
+            frames: this.anims.generateFrameNumbers('amoeba', { start: 0, end: 2 }),
             frameRate: 10,
             repeat: 1
         })
-
         this.anims.create({
             key: 'stop',
-            frames: this.anims.generateFrameNumbers('amoeba', { start: 6, end: 8 }),
+            frames: this.anims.generateFrameNumbers('amoeba', { start: 0, end: 2 }),
             frameRate: 10,
             repeat: -1
         })
+
         this.anims.play('stop', true)
     }
     update() {

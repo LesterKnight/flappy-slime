@@ -50,7 +50,7 @@ export default class Game extends Phaser.Scene {
         this.soundCoin = this.sound.add('coin', { loop: false })
         this.soundCoin.setVolume(0.2)
  
-        const backgrounds = ['bg0', 'bg1', 'bg2', 'bg3']
+        const backgrounds = ['bg0']
         const randomIndex = Math.floor(Math.random() * backgrounds.length);
         this.tileBackground = this.add.tileSprite(0, 0, 320, 224, backgrounds[randomIndex])
         this.tileBackground.setOrigin(0, 0)

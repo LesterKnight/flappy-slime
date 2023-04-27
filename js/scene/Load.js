@@ -17,9 +17,6 @@ export default class Load extends Phaser.Scene {
             this.scene.start('GameScene')
         })
         this.load.image('bg0', 'images/bg0.png')
-        this.load.image('bg1', 'images/bg1.png')
-        this.load.image('bg2', 'images/bg2.png')
-        this.load.image('bg3', 'images/bg3.png')
         this.load.image('bg4', 'images/bg4.png')
         this.load.image('gnd', 'images/ground.png')
 
