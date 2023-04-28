@@ -32,11 +32,11 @@ export default class Game extends Phaser.Scene {
             this.newHighScore.setVisible(true)
     }
 
-    updateTubes(){
+    updateTubes() {
         let tubes = this.tubeGroup.getChildren()
         if (tubes.length == 0 && this.run)
-            new Tube(this, this.game.config.width+100, 0, this.playerHeight*3.2,-100)
-            
+            new Tube(this, this.game.config.width + 100, 0, this.playerHeight * 3.2, -100)
+
         tubes.forEach(function (childTube) {
             if (childTube.x < 0) {
                 childTube.destroy()
@@ -47,7 +47,7 @@ export default class Game extends Phaser.Scene {
                 childTube.y == 0 &&
                 !this.player.crashed
             ) {
-                new Tube(this, this.game.config.width+100, 0, this.playerHeight*3.2,-100)
+                new Tube(this, this.game.config.width + 100, 0, this.playerHeight * 3.2, -100)
                 childTube.createdNewOne = true
             }
         }, this)
@@ -56,22 +56,22 @@ export default class Game extends Phaser.Scene {
     create() {
         this.physics.world.setBounds(0, 0, this.game.config.width, this.game.config.height)
 
-        
+
 
         this.title = new Title(this)
         const playerSpeed = -900
         this.player = new Player(
             this,
-            this.game.config.width*0.4,
-            this.game.config.height/2,
+            this.game.config.width * 0.4,
+            this.game.config.height / 2,
             playerSpeed
-            )
+        )
 
         this.player.create()
 
         this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
         this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
-        this.tubeDistance = this.game.config.width*0.4
+        this.tubeDistance = this.game.config.width * 0.4
         this.score = 0
 
         this.musicMain = this.sound.add('coffin', { loop: true })
@@ -80,7 +80,7 @@ export default class Game extends Phaser.Scene {
         this.musicGameOver.setVolume(0.5)
         this.soundCoin = this.sound.add('coin', { loop: false })
         this.soundCoin.setVolume(0.2)
- 
+
         const backgrounds = ['bg0']
 
         const randomIndex = Math.floor(Math.random() * backgrounds.length)
@@ -88,7 +88,7 @@ export default class Game extends Phaser.Scene {
         //calcular altura da tela para saber a proporção da escala
         const bgWidth = this.textures.get(backgrounds[randomIndex]).getSourceImage().width
         const bhHeight = this.textures.get(backgrounds[randomIndex]).getSourceImage().height
-        const bgScale = this.game.config.height/bhHeight
+        const bgScale = this.game.config.height / bhHeight
 
         this.tileBackground = this.add.tileSprite(0, 0, bgWidth, bhHeight, backgrounds[randomIndex])
         this.tileBackground.setOrigin(0, 0)
@@ -96,17 +96,17 @@ export default class Game extends Phaser.Scene {
 
         const gndWidth = this.textures.get(backgrounds[randomIndex]).getSourceImage().width
         const gndHeight = this.textures.get(backgrounds[randomIndex]).getSourceImage().height
-        const gndScale = this.game.config.height/bhHeight
+        const gndScale = this.game.config.height / bhHeight
 
         this.tileGround = this.add.tileSprite(0, this.game.config.height, this.game.config.width, 30, 'gnd')///////////////////////////////////////////////////////
         this.tileGround.setOrigin(0, 1)
         this.tileGround.setScale(2)
         this.tileGround.setDepth(9)
-        
+
         const colors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x4b0082, 0x8b00ff]
         const tintSpeed = 100
         let colorIndex = 0
-        
+
         this.time.addEvent({
             delay: tintSpeed,
             loop: true,
@@ -114,11 +114,11 @@ export default class Game extends Phaser.Scene {
                 if (this.player.crashed) {
                     this.player.setTint(colors[colorIndex])
                     colorIndex = (colorIndex + 1) % colors.length
-                    if(this.showHighScore){
+                    if (this.showHighScore) {
                         this.scoreText.setTint(colors[colorIndex])
                         this.newHighScore.setTint(colors[colorIndex])
                     }
-                    
+
                 }
             }
         })
@@ -133,16 +133,24 @@ export default class Game extends Phaser.Scene {
         }, this.player)
 
         this.physics.add.overlap(this.tubeGroup, this.player, handleCollision.bind(this))
-        function handleCollision(element1, element2) {
-            if (!element1.crashed) {
-                element1.crash()
+        function handleCollision(player, element2) {
+
+            const overlapThreshold = 0.1
+            const overlapRect = Phaser.Geom.Intersects.GetRectangleIntersection(player.getBounds(), element2.getBounds())
+            const overlapArea = overlapRect.width * overlapRect.height
+
+            const playerArea = player.displayWidth * player.displayHeight
+
+            
+            if ((overlapArea >= playerArea * overlapThreshold) && !player.crashed) {
+                player.crash()
                 this.gameOverAnimation()
             }
         }
-        
-        this.scoreText = this.add.text(this.game.config.width/2, 16, `Hi Score: ${this.game.highScore}`, this.game.fontStyleMini)
+
+        this.scoreText = this.add.text(this.game.config.width / 2, 16, `Hi Score: ${this.game.highScore}`, this.game.fontStyleMini)
         this.newHighScore = this.add.text(0, 100, 'NEW HIGH SCORE!', this.game.fontStyle)
-        this.newHighScore.x = (this.game.config.width - this.newHighScore.width)/2
+        this.newHighScore.x = (this.game.config.width - this.newHighScore.width) / 2
         this.showHighScore = false
 
         this.scoreText.setDepth(11)
