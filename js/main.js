@@ -1,10 +1,11 @@
 import Load from './scene/Load.js'
 import Game from './scene/Game.js'
 
+
 const config = {
     type: Phaser.AUTO,
-    width:480,
-    height:800,
+    width: window.innerWidth,
+    height: window.innerHeight,
     parent:'page',
     scene:[
         Load,

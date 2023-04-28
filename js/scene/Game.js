@@ -18,7 +18,7 @@ export default class Game extends Phaser.Scene {
             targets: graphics,
             alpha: 0,
             duration: 500,
-            ease: 'Power1', // curva de animação
+            ease: 'Power2', // curva de animação
             onComplete: () => graphics.destroy()
         })
 
@@ -32,15 +32,46 @@ export default class Game extends Phaser.Scene {
             this.newHighScore.setVisible(true)
     }
 
+    updateTubes(){
+        let tubes = this.tubeGroup.getChildren()
+        if (tubes.length == 0 && this.run)
+            new Tube(this, this.game.config.width+100, 0, this.playerHeight*3.2,-100)
+            
+        tubes.forEach(function (childTube) {
+            if (childTube.x < 0) {
+                childTube.destroy()
+            }
+            else if (
+                childTube.x - childTube.displayWidth < this.tubeDistance &&
+                !childTube.createdNewOne &&
+                childTube.y == 0 &&
+                !this.player.crashed
+            ) {
+                new Tube(this, this.game.config.width+100, 0, this.playerHeight*3.2,-100)
+                childTube.createdNewOne = true
+            }
+        }, this)
+    }
+
     create() {
-        this.physics.world.setBounds(0, 0, 480, 800)
+        this.physics.world.setBounds(0, 0, this.game.config.width, this.game.config.height)
+
+        
+
         this.title = new Title(this)
-        this.player = new Player(this)
+        const playerSpeed = -900
+        this.player = new Player(
+            this,
+            this.game.config.width*0.4,
+            this.game.config.height/2,
+            playerSpeed
+            )
+
         this.player.create()
 
         this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
         this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
-        this.tubeDistance = 180
+        this.tubeDistance = this.game.config.width*0.4
         this.score = 0
 
         this.musicMain = this.sound.add('coffin', { loop: true })
@@ -51,12 +82,24 @@ export default class Game extends Phaser.Scene {
         this.soundCoin.setVolume(0.2)
  
         const backgrounds = ['bg0']
-        const randomIndex = Math.floor(Math.random() * backgrounds.length);
-        this.tileBackground = this.add.tileSprite(0, 0, 320, 224, backgrounds[randomIndex])
+
+        const randomIndex = Math.floor(Math.random() * backgrounds.length)
+
+        //calcular altura da tela para saber a proporção da escala
+        const bgWidth = this.textures.get(backgrounds[randomIndex]).getSourceImage().width
+        const bhHeight = this.textures.get(backgrounds[randomIndex]).getSourceImage().height
+        const bgScale = this.game.config.height/bhHeight
+
+        this.tileBackground = this.add.tileSprite(0, 0, bgWidth, bhHeight, backgrounds[randomIndex])
         this.tileBackground.setOrigin(0, 0)
-        this.tileBackground.setScale(3.6)
-        this.tileGround = this.add.tileSprite(0, 750, 480, 30, 'gnd')
-        this.tileGround.setOrigin(0, 0)
+        this.tileBackground.setScale(bgScale)
+
+        const gndWidth = this.textures.get(backgrounds[randomIndex]).getSourceImage().width
+        const gndHeight = this.textures.get(backgrounds[randomIndex]).getSourceImage().height
+        const gndScale = this.game.config.height/bhHeight
+
+        this.tileGround = this.add.tileSprite(0, this.game.config.height, this.game.config.width, 30, 'gnd')///////////////////////////////////////////////////////
+        this.tileGround.setOrigin(0, 1)
         this.tileGround.setScale(2)
         this.tileGround.setDepth(9)
         
@@ -97,8 +140,9 @@ export default class Game extends Phaser.Scene {
             }
         }
         
-        this.scoreText = this.add.text(220, 16, `Hi Score: ${this.game.highScore}`, this.game.fontStyleMini)
-        this.newHighScore = this.add.text(90, 100, 'NEW HIGH SCORE!', this.game.fontStyle)
+        this.scoreText = this.add.text(this.game.config.width/2, 16, `Hi Score: ${this.game.highScore}`, this.game.fontStyleMini)
+        this.newHighScore = this.add.text(0, 100, 'NEW HIGH SCORE!', this.game.fontStyle)
+        this.newHighScore.x = (this.game.config.width - this.newHighScore.width)/2
         this.showHighScore = false
 
         this.scoreText.setDepth(11)
@@ -132,6 +176,7 @@ export default class Game extends Phaser.Scene {
 
     update() {
         this.player.update()
+        this.updateTubes()
         this.tileBackground.tilePositionX += 0.3
         if (!this.player.crashed)
             this.tileGround.tilePositionX += 0.835
@@ -152,24 +197,5 @@ export default class Game extends Phaser.Scene {
             this.player.disable()
             this.scene.restart()
         }
-
-        let tubes = this.tubeGroup.getChildren()
-        if (tubes.length == 0 && this.run)
-            new Tube(this, 580, 0)
-
-        tubes.forEach(function (childTube) {
-            if (childTube.x < 0) {
-                childTube.destroy()
-            }
-            else if (
-                childTube.x - childTube.displayWidth < this.tubeDistance &&
-                !childTube.createdNewOne &&
-                childTube.y == 0 &&
-                !this.player.crashed
-            ) {
-                new Tube(this)
-                childTube.createdNewOne = true
-            }
-        }, this)
     }
 }

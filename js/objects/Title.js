@@ -1,10 +1,13 @@
 export default class Title extends Phaser.GameObjects.Sprite {
     constructor(scene) {
-        super(scene, 35, 80, 'title')
+        super(scene, 0, 0, 'title')
         scene.physics.world.enable(this);
         this.setOrigin(0, 0)
-        this.setScale(1.9)
-        this.alpha = 0.9
+        const newWidth =  scene.game.config.width*0.9
+        const newMargin = scene.game.config.width*0.05
+        this.setScale(newWidth/this.width)
+        this.x = newMargin
+        this.alpha = 1
         this.setDepth(10)
         this.body.setAllowGravity(false)
         scene.add.existing(this)

@@ -1,7 +1,8 @@
 let i=0
 export default class Player extends Phaser.GameObjects.Sprite {
-    constructor(scene, jumpSpeed = -900) {
-        super(scene, 170, 300, 'amoeba')
+    constructor(scene,x,y, jumpSpeed) {
+        super(scene, x, y, 'amoeba')
+        this.scene = scene
         scene.physics.world.enable(this);
         this.jumpSpeed = jumpSpeed
         this.jumping = false
@@ -9,7 +10,12 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.click = false
         this.scene = scene
         this.setOrigin(0, 0)
-        this.setScale(3)
+
+        this.gameSceneProportionH =  scene.game.config.height * 0.1
+        this.playerScale = Math.floor(this.gameSceneProportionH/this.height)
+        this.setScale(this.playerScale)
+        scene.playerHeight = this.displayHeight
+
         scene.physics.world.enable(this);
         this.body.setAllowGravity(false)
         this.body.setCollideWorldBounds(true)
@@ -48,7 +54,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
 
     isOutOfBounds() {
-        return (this.body.y > 800 || this.body.x > 480)
+        return (this.body.y > this.scene.game.config.height || this.body.x > this.scene.game.config.width)
     }
 
     create() {
