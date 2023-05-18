@@ -35,7 +35,7 @@ export default class Game extends Phaser.Scene {
     updateTubes() {
         let tubes = this.tubeGroup.getChildren()
         if (tubes.length == 0 && this.run)
-            new Tube(this, this.game.config.width + 100, 0, this.playerHeight * 3.2, -100)
+            new Tube(this, this.game.config.width + 100, 0, 100, -100)
 
         tubes.forEach(function (childTube) {
             if (childTube.x < 0) {
@@ -47,17 +47,19 @@ export default class Game extends Phaser.Scene {
                 childTube.y == 0 &&
                 !this.player.crashed
             ) {
-                new Tube(this, this.game.config.width + 100, 0, this.playerHeight * 3.2, -100)
+                new Tube(this, this.game.config.width + 100, 0, 100, -100)
                 childTube.createdNewOne = true
             }
         }, this)
     }
 
     create() {
+        this.musicIntro = this.sound.add('intro', { loop: true })
+        this.musicIntro.setVolume(1)
+        this.musicIntro.play()
+
         this.physics.world.setBounds(0, 0, this.game.config.width, this.game.config.height)
-
-
-
+        this.tempoAnterior = 0;
         this.title = new Title(this)
         const playerSpeed = -900
         this.player = new Player(
@@ -71,15 +73,15 @@ export default class Game extends Phaser.Scene {
 
         this.tubeGroup = this.physics.add.group({ immovable: false, allowGravity: false })
         this.scoreGroup = this.physics.add.group({ immovable: false, allowGravity: false })
-        this.tubeDistance = this.game.config.width * 0.4
+        this.tubeDistance = this.game.config.width * 0.6
         this.score = 0
 
         this.musicMain = this.sound.add('coffin', { loop: true })
-        this.musicMain.setVolume(0.8)
+        this.musicMain.setVolume(1)
         this.musicGameOver = this.sound.add('gameover', { loop: true })
-        this.musicGameOver.setVolume(0.5)
+        this.musicGameOver.setVolume(1)
         this.soundCoin = this.sound.add('coin', { loop: false })
-        this.soundCoin.setVolume(0.2)
+        this.soundCoin.setVolume(1)
 
         const backgrounds = ['bg0']
 
@@ -102,6 +104,7 @@ export default class Game extends Phaser.Scene {
         this.tileGround.setOrigin(0, 1)
         this.tileGround.setScale(2)
         this.tileGround.setDepth(9)
+        //this.tileGround.setVisible(false)
 
         const colors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x4b0082, 0x8b00ff]
         const tintSpeed = 100
@@ -182,12 +185,22 @@ export default class Game extends Phaser.Scene {
         })
     }
 
+
+    
     update() {
         this.player.update()
         this.updateTubes()
+
         this.tileBackground.tilePositionX += 0.3
-        if (!this.player.crashed)
-            this.tileGround.tilePositionX += 0.835
+        if (!this.player.crashed){
+            let score = this.scoreGroup.getChildren()[0]
+            if(score!=null)
+                if(score.body!=null){
+                    let increase = score.body.position.x - score.body.prev.x
+                    this.tileGround.tilePositionX -= increase/2
+                }
+        }
+            
 
         if ((this.player.spacebar.isDown || this.player.click) && !this.player.crashed && !this.run) {//START GAME
             this.run = true
@@ -195,6 +208,7 @@ export default class Game extends Phaser.Scene {
             this.scoreText.setVisible(true)
             this.player.body.setAllowGravity(true)
             this.title.destroy()
+            this.musicIntro.stop()
             this.musicMain.play()
 
         }

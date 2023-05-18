@@ -3,7 +3,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
     constructor(scene,x,y, jumpSpeed) {
         super(scene, x, y, 'amoeba')
         this.scene = scene
-        scene.physics.world.enable(this);
+
         this.jumpSpeed = jumpSpeed
         this.jumping = false
         this.crashed = false
@@ -11,7 +11,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
         this.scene = scene
         this.setOrigin(0, 0)
 
-        this.gameSceneProportionH =  scene.game.config.height * 0.1
+        this.gameSceneProportionH =  scene.game.config.height * 0.089
         this.playerScale = Math.floor(this.gameSceneProportionH/this.height)
         this.setScale(this.playerScale)
         scene.playerHeight = this.displayHeight

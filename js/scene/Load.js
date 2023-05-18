@@ -19,17 +19,20 @@ export default class Load extends Phaser.Scene {
         this.load.image('bg0', 'images/bg0.png')
         this.load.image('bg4', 'images/bg4.png')
         this.load.image('gnd', 'images/ground.png')
-
+        this.load.image('bg4', 'images/bg4.png')
+        this.load.image('pipe', 'images/pipe.png')
+        this.load.image('pipeBase', 'images/pipeBase.png')
 
         this.loadFont("super-mario-world-superbig", '../font/super-mario-world-superbig.ttf');
 
         this.load.image('title', 'images/title.png' )
-        this.load.audio('coffin','music/coffin.mp3')
-        this.load.audio('gameover','music/gameover.mp3')
+        this.load.audio('coffin','music/gameloop.wav')
+        this.load.audio('gameover','music/gameover.wav')
+        this.load.audio('intro','music/main.wav')
         this.load.audio('jumping','sfx/jump.mp3')
         this.load.audio('coin','sfx/coin.mp3')
         
-        this.load.spritesheet('pipe', 'images/pipe.png',{ frameWidth: 32, frameHeight: 16 } )//endFrame optional
+
         this.load.spritesheet('amoeba', 'images/amoeba.png', {
             frameWidth: 22,
             frameHeight: 18,

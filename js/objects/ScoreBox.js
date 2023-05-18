@@ -6,5 +6,6 @@ export default class ScoreBox extends Phaser.GameObjects.Rectangle {
         scene.scoreGroup.add(this)
         scene.add.existing(this)
         this.body.setVelocityX(speed)
+        scene.physics.world.enable(this);
       }
 }
