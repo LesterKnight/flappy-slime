@@ -55,7 +55,7 @@ export default class Game extends Phaser.Scene {
 
     create() {
         this.musicIntro = this.sound.add('intro', { loop: true })
-        this.musicIntro.setVolume(1)
+        this.musicIntro.setVolume(1.2)
         this.musicIntro.play()
 
         this.physics.world.setBounds(0, 0, this.game.config.width, this.game.config.height)
